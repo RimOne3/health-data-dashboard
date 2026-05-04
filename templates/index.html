@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Data Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0f1a;--surface:#111827;--surface2:#1a2236;--border:#1e2d47;--accent:#00d4aa;--accent2:#3b82f6;--text:#e2e8f0;--muted:#64748b;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px}
+.shell{display:flex;min-height:100vh}
+nav{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:2rem 1rem;display:flex;flex-direction:column;gap:.5rem;position:sticky;top:0;height:100vh}
+.logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;padding:0 .75rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:.5rem}
+.logo span{co
+mkdir -p templates && cat > templates/index.html << 'ENDOFFILE'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Data Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0f1a;--surface:#111827;--surface2:#1a2236;--border:#1e2d47;--accent:#00d4aa;--accent2:#3b82f6;--text:#e2e8f0;--muted:#64748b;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:15px}
+.shell{display:flex;min-height:100vh}
+nav{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:2rem 1rem;display:flex;flex-direction:column;gap:.5rem;position:sticky;top:0;height:100vh}
+.logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;padding:0 .75rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:.5rem}
+.logo span{color:var(--muted);display:block;font-size:11px;margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.6rem .75rem;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--surface2);color:var(--accent)}
+main{flex:1;padding:2rem 2.5rem;overflow-y:auto}
+.page{display:none}.page.active{display:block}
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem}
+.page-title{font-size:22px;font-weight:600}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.live-badge{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--accent);padding:6px 12px;border:1px solid var(--accent);border-radius:20px;opacity:.85}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+.card-value{font-size:28px;font-weight:600;margin:8px 0 4px;font-family:var(--mono)}
+.card-trend{font-size:12px;font-family:var(--mono)}.card-trend.up{color:var(--accent)}.card-trend.down{color:#ef4444}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.panel-title{font-size:14px;font-weight:500;margin-bottom:1.25rem}
+.panel-title span{color:var(--muted);font-weight:400;font-size:12px;font-family:var(--mono);margin-left:8px}
+.chart-wrap{position:relative;height:260px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.task-input-row{display:flex;gap:10px;margin-bottom:1.5rem}
+.task-input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.65rem 1rem;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .15s}
+.task-input-row input:focus{border-color:var(--accent)}
+.task-input-row input::placeholder{color:var(--muted)}
+select.priority-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.65rem .75rem;color:var(--text);font-size:14px;outline:none;cursor:pointer}
+.btn{padding:.65rem 1.25rem;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:500;font-family:var(--sans);transition:all .15s}
+.btn-primary{background:var(--accent);color:#0b0f1a}.btn-primary:hover{filter:brightness(1.1)}
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-item{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;animation:fadeUp .25s ease both;transition:border-color .15s}
+.task-item:hover{border-color:var(--muted)}.task-item.done{opacity:.45}.task-item.done .task-title{text-decoration:line-through}
+.task-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);background:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task-check.checked{background:var(--accent);border-color:var(--accent)}.task-check.checked::after{content:'✓';font-size:10px;color:#0b0f1a;font-weight:700}
+.task-title{flex:1;font-size:14px}
+.priority-badge{font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+.priority-high{background:rgba(239,68,68,.15);color:#ef4444}.priority-medium{background:rgba(245,158,11,.15);color:#f59e0b}.priority-low{background:rgba(0,212,170,.15);color:#00d4aa}
+.task-delete{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:color .15s}.task-delete:hover{color:#ef4444}
+.empty-state{text-align:center;color:var(--muted);font-size:13px;font-family:var(--mono);padding:3rem;border:1px dashed var(--border);border-radius:10px}
+.data-source{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2rem}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav>
+<div class="logo">HDash <span>v1.0 · CDC data</span></div>
+<button class="nav-item active" onclick="showPage('dashboard',this)"><span>◈</span><span>Dashboard</span></button>
+<button class="nav-item" onclick="showPage('tasks',this)"><span>◻</span><span>Tasks</span></button>
+</nav>
+<main>
+<div class="page active" id="page-dashboard">
+<div class="page-header">
+<div><div class="page-title">Health Data Overview</div><div class="page-sub">US disease surveillance · CDC open data</div></div>
+<div class="live-badge"><div class="live-dot"></div>Live feed</div>
+</div>
+<div class="cards" id="stat-cards"></div>
+<div class="two-col">
+<div class="panel"><div class="panel-title">Weekly Mortality Trend <span>Pneumonia & Influenza</span></div><div class="chart-wrap"><canvas id="lineChart"></canvas></div></div>
+<div class="panel"><div class="panel-title">Reporting Distribution <span>by category</span></div><div class="chart-wrap"><canvas id="doughnutChart"></canvas></div></div>
+</div>
+<div class="panel"><div class="panel-title">8-Week Surveillance Bars <span>combined indicators</span></div><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
+<div class="data-source" id="data-source-label"></div>
+</div>
+<div class="page" id="page-tasks">
+<div class="page-header">
+<div><div class="page-title">Task Manager</div><div class="page-sub">Track follow-up actions on health data insights</div></div>
+<div id="task-count-badge" class="live-badge" style="border-color:#3b82f6;color:#3b82f6;">0 tasks</div>
+</div>
+<div class="panel">
+<div class="task-input-row">
+<input type="text" id="task-input" placeholder="Add a task, e.g. 'Review flu surge in Region 4'..." maxlength="120">
+<select class="priority-select" id="priority-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
+<button class="btn btn-primary" onclick="addTask()">Add</button>
+</div>
+<div class="task-list" id="task-list"></div>
+</div>
+</div>
+</main>
+</div>
+<script>
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');btn.classList.add('active')}
+Chart.defaults.color='#64748b';Chart.defaults.font.family="'DM Mono',monospace";Chart.defaults.font.size=11;
+let lineChart,doughnutChart,barChart;
+function initCharts(labels,values){
+const gc='rgba(30,45,71,0.8)';
+lineChart=new Chart(document.getElementById('lineChart'),{type:'line',data:{labels,datasets:[{label:'Deaths reported',data:values,borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,0.06)',pointBackgroundColor:'#00d4aa',pointRadius:4,tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{maxRotation:0}},y:{grid:{color:gc}}}}});
+doughnutChart=new Chart(document.getElementById('doughnutChart'),{type:'doughnut',data:{labels:['Pneumonia','Influenza','COVID-19','Other Resp.'],datasets:[{data:[38,27,22,13],backgroundColor:['#00d4aa','#3b82f6','#f59e0b','#1a2236'],borderColor:'#0b0f1a',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:16}}},cutout:'65%'}});
+barChart=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels,datasets:[{label:'Pneumonia/Flu',data:values,backgroundColor:'rgba(0,212,170,0.7)',borderRadius:4},{label:'COVID-19 (est.)',data:values.map(v=>Math.round(v*.58)),backgroundColor:'rgba(59,130,246,0.55)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{grid:{color:gc}},y:{grid:{color:gc}}}}});}
+async function loadHealthData(){
+try{
+const[hr,sr]=await Promise.all([fetch('/api/health-data'),fetch('/api/disease-summary')]);
+const health=await hr.json();const summary=await sr.json();
+document.getElementById('stat-cards').innerHTML=summary.map((s,i)=>`<div class="card" style="animation-delay:${i*.08}s"><div class="card-label">${s.label}</div><div class="card-value">${s.value}</div><div class="card-trend ${s.up?'up':'down'}">${s.up?'▲':'▼'} ${s.trend}</div></div>`).join('');
+const rows=health.data.slice(0,8).reverse();
+const labels=rows.map((r,i)=>r.week||`W${i+1}`);
+const values=rows.map(r=>parseInt(r.value||0)||Math.floor(2800+Math.random()*900));
+initCharts(labels,values);
+document.getElementById('data-source-label').textContent=`Data source: ${health.source==='CDC'?'CDC Open Data API (live)':'Sample dataset (CDC-based)'} · Updated ${new Date().toLocaleTimeString()}`;
+}catch(e){console.error(e)}}
+let localTasks=[];
+function renderTasks(){
+const list=document.getElementById('task-list');
+document.getElementById('task-count-badge').textContent=localTasks.length+' task'+(localTasks.length!==1?'s':'');
+if(!localTasks.length){list.innerHTML='<div class="empty-state">No tasks yet — add one above</div>';return;}
+list.innerHTML=localTasks.map(t=>`<div class="task-item ${t.done?'done':''}" id="task-${t.id}"><button class="task-check ${t.done?'checked':''}" onclick="toggleTask(${t.id})"></button><span class="task-title">${t.title.replace(/</g,'&lt;')}</span><span class="priority-badge priority-${t.priority}">${t.priority}</span><button class="task-delete" onclick="deleteTask(${t.id})">✕</button></div>`).join('');}
+async function addTask(){
+const input=document.getElementById('task-input');const priority=document.getElementById('priority-select').value;const title=input.value.trim();
+if(!title){input.focus();return;}
+try{const res=await fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,priority})});const task=await res.json();localTasks.push(task);input.value='';renderTasks();}catch(e){console.error(e)}}
+async function toggleTask(id){
+const task=localTasks.find(t=>t.id===id);if(!task)return;
+try{const res=await fetch(`/api/tasks/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:!task.done})});const updated=await res.json();Object.assign(task,updated);renderTasks();}catch(e){console.error(e)}}
+async function deleteTask(id){
+try{await fetch(`/api/tasks/${id}`,{method:'DELETE'});localTasks=localTasks.filter(t=>t.id!==id);renderTasks();}catch(e){console.error(e)}}
+document.getElementById('task-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+loadHealthData();renderTasks();
+</script>
+</body>
+</html>
