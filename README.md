@@ -3,7 +3,7 @@
 > A full-stack web application that visualizes real-time US public health surveillance data alongside an integrated task management system — built to make health data actionable.
 
 ![Dashboard](./screenshot.png)
-
+![Dashboard 2](./screenshot2.png)
 ## Overview
 
 This project pulls live disease surveillance data from the **CDC Open Data API** and displays it through an interactive dashboard with trend charts, summary statistics, and a breakdown by indicator. A built-in task manager lets users log and track follow-up actions directly tied to what they're seeing in the data.
